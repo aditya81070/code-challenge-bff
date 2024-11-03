@@ -68,7 +68,19 @@ src
     yarn dev
 ```
 
+3. To run the tests:
+
+```bash
+    yarn test:watch
+```
+
 ### Building the Project
+
+Run tests before building the project:
+
+```bash
+    yarn test
+```
 
 To compile the TypeScript files into JavaScript and prepare for production:
 
