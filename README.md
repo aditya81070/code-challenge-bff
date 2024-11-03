@@ -1,48 +1,90 @@
-Zeller is starting a computer store. You have been engaged to build the checkout system. We will start with the following products in our catalogue
+# Computer Store Checkout System
 
+## Overview
 
-| SKU     | Name        | Price    |
-| --------|:-----------:| --------:|
-| ipd     | Super iPad  | $549.99  |
-| mbp     | MacBook Pro | $1399.99 |
-| atv     | Apple TV    | $109.50  |
-| vga     | VGA adapter | $30.00   |
+This document provides an overview of the entities, data flow, and commands for building and running the TypeScript-based checkout system for the computer store.
 
-As we're launching our new computer store, we would like to have a few opening day specials.
+## Folder Structure
 
-- we're going to have a 3 for 2 deal on Apple TVs. For example, if you buy 3 Apple TVs, you will pay the price of 2 only
-- the brand new Super iPad will have a bulk discounted applied, where the price will drop to $499.99 each, if someone buys more than 4
-
-As our Sales manager is quite indecisive, we want the pricing rules to be as flexible as possible as they can change in the future with little notice.
-
-Our checkout system can scan items in any order.
-
-The interface to our checkout looks like this (shown in typescript):
-
-```typescript
-  const co = new Checkout(pricingRules);
-  co.scan(item1);
-  co.scan(item2);
-  co.total();
+```
+src
+├── data
+│   └── skus.json
+├── entities
+│   ├── pricing-rule.ts
+│   └── sku.ts
+├── main.ts
+├── repositories
+│   ├── inventory.ts
+│   └── pricing-rules-list.ts
+└── services
+    └── checkout.ts
 ```
 
-Your task is to implement a checkout system that fulfils the requirements described above.
+### Description of Each Folder
 
-Example scenarios
------------------
+- **data**: Contains static data files, such as `skus.json`, which holds the inventory information in JSON format.
 
-SKUs Scanned: atv, atv, atv, vga
-Total expected: $249.00
+- **entities**: Contains TypeScript classes that define the core objects used in the system.
 
-SKUs Scanned: atv, ipd, ipd, atv, ipd, ipd, ipd
-Total expected: $2718.95
+  - **pricing-rule.ts**: Defines the `PricingRule` class, which encapsulates the logic for various pricing strategies applicable to SKUs.
+  - **sku.ts**: Defines the `SKU` class, which represents a stock-keeping unit, including attributes such as name and price.
 
-Notes on implementation:
+- **main.ts**: The entry point of the application. This file initializes the necessary components, loads the inventory data, and sets up the checkout system.
 
-- use **Typescript**
-- try not to spend more than 2 hours maximum. (We don't want you to lose a weekend over this!)
-- don't build guis etc, we're more interested in your approach to solving the given task, not how shiny it looks
-- don't worry about making a command line interface to the application
-- don't use any frameworks
+- **repositories**: Contains classes that manage data operations related to the entities.
 
-When you've finished, send through the link to your github-repo.
+  - **inventory.ts**: Manages the inventory of SKUs, providing methods to fetch SKU data and handle inventory operations.
+  - **pricing-rules-list.ts**: Manages a list of pricing rules, allowing for retrieval and updates of pricing strategies.
+
+- **services**: Contains classes that provide business logic and operations.
+  - **checkout.ts**: Implements the checkout logic, processing scanned items and applying pricing rules to calculate the total price.
+
+## Data Flow
+
+1. **Loading SKUs**: The application reads SKU data from `skus.json` in the `data` folder, which contains all available products and their prices.
+
+2. **Creating Entities**: The SKU data is used to instantiate `SKU` objects in the `entities` folder.
+
+3. **Applying Pricing Rules**: The `PricingRule` class in the `entities` folder defines various pricing strategies, such as bulk discounts or special offers, which are stored in `pricing-rules-list.ts`.
+
+4. **Processing Checkout**: When a user scans items, the `Checkout` service uses the `Inventory` to fetch SKU details and applies relevant pricing rules to calculate the final total price.
+
+5. **Output**: The final price is returned to the user, reflecting any discounts or promotions applied.
+
+## Running Commands
+
+### Development Mode
+
+1. Install dependencies:
+
+```bash
+    yarn
+```
+
+2. To run the application in development mode using `ts-node` (which allows running TypeScript files directly):
+
+```bash
+    yarn dev
+```
+
+### Building the Project
+
+To compile the TypeScript files into JavaScript and prepare for production:
+
+```bash
+    yarn build
+```
+
+This command will:
+
+1. Remove the dist folder (if it exists).
+2. Compile TypeScript files and output them to the dist folder.
+
+### Production Mode
+
+To run the compiled JavaScript files in production mode:
+
+```bash
+yarn prod
+```
