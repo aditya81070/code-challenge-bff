@@ -1,4 +1,4 @@
-type RuleType = "discount" | "reducedPrice" | "both";
+type RuleType = "discount" | "reducedPrice";
 
 interface RuleDefinition {
   quantity?: number; // For discount rule (e.g., 3-for-2)
@@ -39,18 +39,6 @@ export class PricingRule {
         }
         break;
 
-      case "both":
-        if (
-          typeof this.definition.quantity !== "number" ||
-          typeof this.definition.discountedQuantity !== "number" ||
-          typeof this.definition.bulkPrice !== "number"
-        ) {
-          throw new Error(
-            `Invalid definition for combined rule on SKU ${this.skuId}. Expected "quantity", "discountedQuantity", and "bulkPrice" to be numbers.`
-          );
-        }
-        break;
-
       default:
         throw new Error(`Unknown rule type: ${this.type}`);
     }
@@ -63,9 +51,6 @@ export class PricingRule {
 
       case "reducedPrice":
         return this.applyReducedPrice(count, price);
-
-      case "both":
-        return this.applyBoth(count, price);
 
       default:
         return count * price; // Regular price if no rule type matches
@@ -82,26 +67,9 @@ export class PricingRule {
   }
 
   private applyReducedPrice(count: number, price: number): number {
-    if (count > this.definition.quantity!) {
+    if (count >= this.definition.quantity!) {
       return count * this.definition.bulkPrice!;
     }
     return count * price;
-  }
-
-  private applyBoth(count: number, price: number): number {
-    // Step 1: Apply multi-buy discount (e.g., "3 for 2" offer)
-    const discountSets = Math.floor(count / this.definition.quantity!);
-    const discountedItemsCount =
-      discountSets * this.definition.discountedQuantity!;
-    const remainingItems = count % this.definition.quantity!;
-
-    // Step 2: Check if the total count qualifies for the bulk price
-    const totalDiscountedCount = discountedItemsCount + remainingItems;
-    if (totalDiscountedCount > this.definition.quantity!) {
-      return totalDiscountedCount * this.definition.bulkPrice!;
-    }
-
-    // Step 3: Calculate total using standard price for remaining items
-    return (discountedItemsCount + remainingItems) * price;
   }
 }
